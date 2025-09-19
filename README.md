@@ -25,5 +25,5 @@ Please use the following table to grade the student's assignment:
 Assignment 2:
 
 Assignment 3:
-- Website:
-- Repo: 
+- Website URL: https://lindoreofrk.github.io/assignment-3-xf242/
+- Repo: https://github.com/LindOreoFrk/assignment-3-xf242.git
