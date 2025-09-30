@@ -27,3 +27,6 @@ Assignment 2:
 Assignment 3:
 - Website URL: https://lindoreofrk.github.io/assignment-3-xf242/
 - Repo: https://github.com/LindOreoFrk/assignment-3-xf242.git
+
+Assignment 4: 
+- https://github.com/therkildsen-class/ntres-6100-assignments-LindOreoFrk/blob/master/problem_sets/assignment_4.md
