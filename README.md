@@ -30,3 +30,6 @@ Assignment 3:
 
 Assignment 4: 
 - https://github.com/therkildsen-class/ntres-6100-assignments-LindOreoFrk/blob/master/problem_sets/assignment_4.md
+
+Assignment 5:
+- https://github.com/therkildsen-class/ntres-6100-assignments-LindOreoFrk/blob/master/problem_sets/assignment_5.md
