@@ -1,0 +1,245 @@
+---
+title: "Assignment 8"
+format: gfm
+editor: visual
+---
+
+# Assignment 8: Iteration and conditional execution
+
+<br>
+
+## Instructions: Please read through this before you begin
+
+-   To start, first load all the required packages with the following code. Install them if they are not installed yet.
+
+```{r}
+library(tidyverse)
+```
+
+**Acknowledgements:** Exercise 1 has been adapted (with permission) from the [Data Carpentry for Biologists semester course](https://datacarpentry.org/semester-biology/exercises/Functions-use-and-modify-Python/) and exercises 2 was adapted (with permission) from Iain Carmichael’s course [STOR 390: Introduction to Data Science](https://idc9.github.io/stor390/#course_material).
+
+**Note:** In this assignment, for loops are written in a way such that the output is grown in each iteration using functions such as `c()` and `bind_rows()`. Although this is perhaps a more intuitive method, be aware that it is less efficient computationally compared to predefining the length of the output. For more information on this, we highly recommend you to read the [for loops section](https://r4ds.had.co.nz/iteration.html#for-loops) in the R for Data Science book.
+
+## **Exercise 1: Body mass estimation using vectorization vs. for loop**
+
+There are two major types of approaches to perform multiple operations in R: [vectorization](https://swcarpentry.github.io/r-novice-gapminder/09-vectorization/) and for loops. As a simple example, to calculate the sum of two vectors, `x` and `y`, the syntax for vectorization is simply `z <- x + y`. With this, the computer will be able to perform the same operation to each element of x and y vector **simultaneously**.
+
+The for loop approach to achieve the same task (create a new vector z that is the sum of vectors x and y), on the other hand, takes the following form:
+
+```{r}
+#z <- NULL
+#for (i in 1:length(x)){
+#  z <- c(z, x[i] + y[i])
+#}
+```
+
+In this case, the computer loops through each element of x and y and performs the operation **sequentially**, resulting in a significantly longer runtime. Let’s now try to quantify this difference in runtime in this exercise.
+
+#### **1.1 A single operation**
+
+The length of an organism is typically strongly correlated with its body mass. This is useful because it allows us to estimate the mass of an organism even if we only know its length. This relationship generally takes the form: `mass = a * length ^ b`, where the parameters `a` and `b` vary among groups. This allometric approach is regularly used to estimate the mass of dinosaurs since we cannot weigh something that is only preserved as bones.
+
+*Spinosaurus* is a predator that is bigger, and therefore, by definition, cooler, than that stupid *Tyrannosaurus* that everyone likes so much. It has an estimated `a` of `0.73` and `b` of `3.63`. What is the estimated mass of a *Spinosaurus* that is `16` m long based on its reassembled skeleton?
+
+```{r}
+a_spino <- 0.73
+b_spino <- 3.63
+length_spino <- 16
+mass_spino <- a_spino * length_spino ^ b_spino
+mass_spino
+round(mass_spino, 2)
+```
+
+#### **1.2 Multiple operations**
+
+The following vectors contain the `length`s of 200 dinosaurs and their respective `a` and `b` values. Estimate their `mass` first using a vectorization approach and then using a for loop approach.
+
+```{r}
+# vectorization approach
+dinosaur_lengths <- c(25.31, 16.7, 25.22, 24.08, 13.85, 24.57, 18.61, 17.79, 26.31, 15.02, 13.42, 16.4, 22.75, 23.68, 21.93, 17.33, 14.74, 21.52, 30.51, 10.98, 20.2, 16.1, 19.1, 13.65, 14.23, 26.76, 25.51, 26.03, 24.89, 18.49, 18.93, 25.46, 23.54, 11.81, 10.66, 30.36, 14.2, 21.34, 21.3, 23.46, 20.77, 17.27, 31, 17.66, 26.02, 16.02, 15.1, 26.05, 22.6, 23.22, 10.35, 21.14, 17.91, 15.35, 13.91, 26.17, 24.89, 16.86, 22.11, 27.07, 14.31, 12.02, 9.82, 19.85, 28.61, 22.57, 13.43, 10.41, 23.26, 22.65, 18.91, 26.58, 12.71, 9.34, 23.97, 22.89, 24.71, 10.73, 20.88, 18.67, 13.26, 16.38, 21.24, 13.39, 21.2, 21.36, 16.49, 26.13, 20.04, 18.9, 16.71, 24.74, 19.98, 18.05, 12.95, 22.64, 16.03, 11.21, 22.48, 20.48, 25.76, 12.01, 17.86, 17.12, 25.34, 22.18, 20.95, 21.17, 14.52, 20.82, 17.87, 27.45, 29.99, 31.3, 24.68, 22.55, 18.13, 18.97, 23.3, 18.66, 19.9, 25.52, 19.89, 24.7, 18.25, 24.53, 23.47, 16.26, 15.08, 19.67, 24.12, 26.03, 29.29, 16.65, 21.55, 22.44, 17.65, 24.67, 23.38, 18.18, 20.5, 25.62, 18.99, 13.3, 16.55, 29.76, 13.74, 25.04, 19.42, 26.29, 10.71, 22.19, 20.03, 23.14, 14.28, 18.93, 27.57, 16.3, 16.05, 23.26, 25.09, 16.97, 22.75, 16.62, 28.7, 20.82, 26.79, 20.75, 28.74, 19.59, 22.94, 24.51, 18.09, 16.91, 16.53, 20.89, 29.85, 12.89, 21.01, 19.41, 23.43, 21.13, 24.58, 23.22, 11.93, 22.36, 22.04, 27.25, 24.24, 11.39, 22.62, 24.38, 21.95, 17, 30.64, 29.53, 25.13, 20.21, 17.51, 26.25)
+a_values <- c(0.61, 0.74, 0.82, 0.78, 0.85, 0.72, 0.84, 0.65, 0.58, 0.82, 0.78, 0.8, 0.69, 0.65, 0.75, 0.72, 0.7, 0.7, 0.65, 0.77, 0.67, 0.86, 0.63, 0.6, 0.67, 0.57, 0.63, 0.72, 0.78, 0.91, 0.67, 0.81, 0.73, 0.8, 0.54, 0.77, 0.86, 0.81, 0.9, 0.68, 0.58, 0.8, 0.72, 0.67, 0.84, 0.63, 0.82, 0.61, 0.74, 0.83, 0.88, 0.66, 0.8, 0.72, 0.75, 0.58, 0.78, 0.76, 0.76, 0.77, 0.91, 0.57, 0.73, 0.87, 0.78, 0.72, 0.73, 0.89, 0.52, 0.87, 0.7, 0.67, 0.7, 0.81, 0.75, 0.7, 0.79, 0.83, 0.57, 0.88, 0.79, 0.77, 0.83, 0.69, 0.69, 0.91, 0.86, 0.66, 0.67, 0.88, 0.78, 0.82, 0.72, 0.86, 0.8, 0.69, 0.7, 0.68, 0.71, 0.83, 0.8, 0.64, 0.68, 0.51, 0.78, 0.8, 0.71, 0.73, 0.88, 0.83, 0.76, 0.95, 0.84, 0.75, 0.85, 0.79, 0.64, 0.94, 0.83, 0.64, 0.83, 0.8, 0.62, 0.79, 0.72, 0.8, 0.63, 0.79, 0.88, 0.64, 0.77, 0.85, 0.93, 0.85, 0.9, 0.83, 0.88, 0.95, 0.64, 0.78, 0.82, 0.77, 0.53, 0.96, 0.78, 0.66, 0.76, 0.69, 0.74, 0.64, 0.79, 1.05, 0.59, 0.82, 0.73, 0.64, 0.8, 0.86, 0.95, 0.95, 0.64, 0.87, 0.75, 0.59, 0.73, 0.7, 0.7, 0.8, 0.79, 0.75, 0.76, 0.64, 0.77, 0.64, 0.78, 0.75, 0.85, 0.75, 0.87, 0.72, 0.7, 0.62, 0.64, 0.79, 0.63, 0.71, 0.79, 0.66, 0.86, 0.93, 0.39, 0.62, 0.73, 0.7, 0.69, 0.7, 0.72, 0.81, 0.77, 0.57)
+b_values <- c(3.63, 3.57, 3.51, 3.5, 3.65, 3.64, 3.6, 3.59, 3.58, 3.61, 3.55, 3.61, 3.57, 3.61, 3.62, 3.62, 3.57, 3.6, 3.56, 3.59, 3.63, 3.61, 3.59, 3.66, 3.54, 3.59, 3.56, 3.65, 3.58, 3.6, 3.66, 3.58, 3.64, 3.62, 3.59, 3.65, 3.56, 3.64, 3.6, 3.52, 3.56, 3.63, 3.59, 3.63, 3.68, 3.65, 3.47, 3.49, 3.64, 3.65, 3.64, 3.6, 3.61, 3.66, 3.62, 3.6, 3.67, 3.62, 3.65, 3.57, 3.53, 3.55, 3.66, 3.51, 3.51, 3.64, 3.62, 3.65, 3.59, 3.68, 3.51, 3.63, 3.59, 3.56, 3.57, 3.66, 3.56, 3.63, 3.61, 3.62, 3.7, 3.63, 3.57, 3.58, 3.6, 3.57, 3.58, 3.58, 3.55, 3.49, 3.71, 3.56, 3.6, 3.59, 3.56, 3.65, 3.65, 3.65, 3.58, 3.57, 3.57, 3.57, 3.52, 3.53, 3.75, 3.68, 3.56, 3.71, 3.57, 3.58, 3.58, 3.57, 3.64, 3.56, 3.63, 3.53, 3.6, 3.7, 3.64, 3.62, 3.59, 3.59, 3.57, 3.58, 3.56, 3.61, 3.6, 3.59, 3.63, 3.63, 3.61, 3.62, 3.59, 3.49, 3.53, 3.58, 3.66, 3.59, 3.69, 3.65, 3.59, 3.67, 3.59, 3.64, 3.61, 3.53, 3.54, 3.49, 3.68, 3.63, 3.64, 3.62, 3.7, 3.69, 3.59, 3.58, 3.61, 3.56, 3.72, 3.58, 3.64, 3.57, 3.72, 3.6, 3.49, 3.63, 3.55, 3.58, 3.62, 3.63, 3.65, 3.57, 3.7, 3.59, 3.64, 3.59, 3.69, 3.5, 3.6, 3.61, 3.56, 3.64, 3.58, 3.62, 3.63, 3.56, 3.66, 3.63, 3.49, 3.54, 3.73, 3.61, 3.47, 3.53, 3.68, 3.63, 3.63, 3.59, 3.52, 3.62)
+
+# vectorized calculation
+mass_vec <- a_values * dinosaur_lengths ^ b_values
+mass_vec
+
+```
+
+```{r}
+# for loop calculation 
+mass_loop <- NULL
+for (i in seq_along(dinosaur_lengths)) {
+  mass_loop <- c(mass_loop, a_values[i] * dinosaur_lengths[i] ^ b_values[i])
+}
+mass_loop  
+```
+
+#### **1.3 Runtime comparison**
+
+The function `system.time()` can be used to record the runtime of an operation. For example, `system.time(rnorm(100000))` can give you the time to draw 100000 samples from a normal distribution. Here, use `system.time()` to record the runtime of the vectorization approach and the for loop approach in the previous question.
+
+-   vectorization:
+
+```{r}
+# timing vectorized approach
+system.time({
+  tmp1 <- a_values * dinosaur_lengths ^ b_values
+})
+```
+
+-   for loop (you will need to put the entire for loop inside the brackets of `system.time()`:
+
+```{r}
+# timing for loop approach
+system.time({
+  tmp2 <- NULL
+  for(i in seq_along(dinosaur_lengths)) {
+    tmp2 <- c(tmp2, a_values[i] * dinosaur_lengths[i] ^ b_values[i])
+  }
+})
+```
+
+Although the for loop in this exercise can be run very quickly, it is noticeably slower than the vectorization approach. With more complicated operations, vectorization can often shorten the runtime of a for loop from days to minutes.
+
+**Note:** the actual runtime depends on the computing power of your computer, so there may not be a noticeable difference between the two approaches if your computer is sufficiently fast.
+
+## **Exercise 2: Data inputting and wrangling in batch**
+
+Another instance where loops are useful is data input / output in batch. We’ve learned how to make plots and output them in batch in class, so in this exercise, you will use for loops to automate the inputting and wrangling process of a group of datasets with similar names and formats in the <https://github.com/nt246/NTRES-6100-data-science/tree/master/datasets/buoydata>.
+
+#### **2.1 Given the following code chunk for reading buoy data files from buoy 44013 for each year, describe the following:**
+
+-   What parts of your code are consistent across every line/code chunk?
+
+-   What parts are different?
+
+```{r}
+buoy_1987 <- read_csv('https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/buoydata/44013_1987.csv', na = c("99", "999", "99.00", "999.0"))
+buoy_1988 <- read_csv('https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/buoydata/44013_1988.csv', na = c("99", "999", "99.00", "999.0"))
+buoy_1989 <- read_csv('https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/buoydata/44013_1989.csv', na = c("99", "999", "99.00", "999.0"))
+buoy_1990 <- read_csv('https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/buoydata/44013_1990.csv', na = c("99", "999", "99.00", "999.0"))
+```
+
+Answer:
+
+Every line uses the same `read_csv()` function, the same base URL (`https://raw.githubusercontent.com/.../buoydata/44013_`), and the same `na` argument (`na = c("99", "999", "99.00", "999.0")`). Only the **year** in both the variable name (`buoy_1987`, `buoy_1988`, etc.) and the file name (`44013_1987.csv`, `44013_1988.csv`, etc.) changes.
+
+#### **2.2 Complete the skeleton of the for loop below, which uses the `str_c()` function to print out the path to the buoy 44013 data file from year `start` to `end`**
+
+```{r}
+start <- 1987
+end <- 1992
+for (year in start:end){
+  path <- str_c("https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/buoydata/44013_", year, ".csv")
+  print(path)
+}
+```
+
+#### **2.3 Complete the skeleton of the for loop below, which reads the buoy 44013 data file from year `start` to `end` and combine them together**
+
+**Hint:** `bind_rows()` could be useful for this question.
+
+```{r}
+start <- 1987
+end <- 1992
+df_combined <- NULL
+for (year in start:end){
+  path <- str_c("https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/buoydata/44013_", year, ".csv")
+  df <- read_csv(path, na = c("99", "999", "99.00", "999.0"))
+  df_combined <- bind_rows(df_combined, df)
+}
+dim(df_combined)
+```
+
+Here is the dimension of the combined data frame (`df_combined`) with `start = 1987` and `end = 1992`:
+
+```{r}
+dim(df_combined)
+```
+
+#### **2.4 Building on the workflow that you used in 2.1 - 2.3, use a for loop to read in, clean up, and summarize the buoy data from all years from 1987 to 1992 using a dplyr workflow.**
+
+Within the loop, for each year, **read** in the data, **select** only the columns `YY` (year), `MM` (month), `WVHT` (wave heights), `WTMP` (temperatures) and **rename** these columns to something understandable, and **summarize** monthly averaged wave heights and temperatures throughout that year. **Combine** these summary tables from different years together and **plot the variation of these monthly averaged values through time** as shown below.
+
+There are multiple ways to do this, and for this question, you may as well combine all the raw data in a for loop and clean it up after the loop. We recommend you to do the cleanup within the loop though as a chance to practice. In the next (optional) question, however, it is necessary to clean up the data in the loop before you can combine them.
+
+```{r}
+years <- 1987:1992
+monthly_all <- NULL
+
+for (yr in years) {
+path <- str_c(
+"https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/buoydata/44013_",
+yr, ".csv"
+)
+dat <- read_csv(path, na = c("99","999","99.00","999.0"), show_col_types = FALSE)
+
+cur <- dat %>%
+select(YY, MM, WVHT, WTMP) %>%
+rename(year = YY, month = MM, wave = WVHT, temp = WTMP) %>%
+mutate(year = as.integer(year), month = as.integer(month)) %>%
+group_by(year, month) %>%
+summarise(mean_wave = mean(wave, na.rm = TRUE),
+mean_temp = mean(temp, na.rm = TRUE),
+.groups = "drop")
+monthly_all <- bind_rows(monthly_all, cur)
+}
+
+p_wave <- monthly_all %>%
+mutate(date = lubridate::make_date(year, month, 1)) %>%
+ggplot(aes(date, mean_wave)) +
+geom_line() +
+labs(x = "year_month", y = "wave_height_mean")
+
+p_temp <- monthly_all %>%
+mutate(date = lubridate::make_date(year, month, 1)) %>%
+ggplot(aes(date, mean_temp)) +
+geom_line() +
+labs(x = "year_month", y = "temperature_c_mean")
+
+p_wave
+p_temp
+```
+
+#### **Reflection Questions:**
+
+#### **When is vectorization preferable to loops in R, and when are loops the right choice? Provide two concrete examples from the assignment.**
+
+Vectorization is preferable when the operation applies to small data.\
+For example, in **Exercise 1**, I calculated dinosaur body masses for hundreds of individuals with one line:
+
+```{r}
+# mass <- a_values * lengths ^ b_values
+```
+
+Loops are better when each iteration involves large data, different logic, or when we need to process files one by one.\
+In **Exercise 2**, I used a `for` loop to read multiple yearly buoy data files (1987–1992) and combine them:
+
+```{r}
+# for(year in 1987:1992) {
+#  path <- str_c("http
+# //.../44013_", year, ".csv")
+#  df <- read_csv(path)
+#  df_all <- bind_rows(df_all, df)
+#}
+```
+
+Here, each iteration reads a different file, so vectorization is not practical. Loops make the code more flexible and easier to modify for irregular datasets.
+
+#### **Which AI prompt was most helpful? What did you learn, and how was correctness verified? Include before/after code snippets with commentary.**
+
+I didn’t understand what “consistent vs different parts” meant in 2.1/2.2 questions and how it is connected with automating loops so I asked ChatGPT "Why identifying different part is important in this question?"
+
+After the AI explained it, I understood that I needed to first identify the different content in those files and them use `loop` and `str_c` functions to automatically replace year into corresponding positions.
+
+```{r}
+#for(year in 1987:1992) {
+#  path <- str_c("https://.../44013_", year, ".csv")
+#  buoy <- read_csv(path, na = c("99", "999", "99.00", "999.0"))
+#  print(buoy)
+#}
+```
+
+\
+This taught me how to identify patterns in repetitive code and replace the changing part (the year) with a variable, which is the key concept behind automating loops.
