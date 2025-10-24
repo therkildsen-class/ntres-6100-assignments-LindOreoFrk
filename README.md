@@ -38,7 +38,6 @@ Assignment 6:
 - https://github.com/therkildsen-class/ntres-6100-assignments-LindOreoFrk/blob/master/problem_sets/assignment_6.md
 
 Assignment 7:
-- 
 
 Assignment 8: 
 - https://github.com/therkildsen-class/ntres-6100-assignments-LindOreoFrk/blob/master/problem_sets/assignment_8.md
