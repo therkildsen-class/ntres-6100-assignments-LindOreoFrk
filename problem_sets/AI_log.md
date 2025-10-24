@@ -5,31 +5,28 @@
 
 ChatGPT 5.0
 
-1.  Prompt(s): paste exact prompt(s) used
+2.  Prompt(s): paste exact prompt(s) used
 
-I am comparing the system operation time using 2 different approaches of
-calculating dinasaur length: vectorizatioin vs. loop using R code. Give
-me the template of how to use system.time() on both vectorization and
-loop functions.
+Why question 1.1 and 1.2 are comparing vectorization vs. loop?
 
-1.  AI output summary: brief summary, not full text
+3.  AI output summary: brief summary, not full text
 
-AI gives me all the R code template from data set up to system.time()
-template. It also provides me with an explanation on how system.time()
-works on vectorized version and loop version and how one is different
-from another.
+It compares 2 approaches on output, code writing style, runtime, and
+suitable situation.
 
-1.  Edits made and rationale: what was changed, why, and what was
+It also explains the reason why these two are put together to be
+compared with each other: for us to see the coding logic behind
+different approaches and to understand that different approaches could
+be utilized under different conditions. And later in exercise 2 we had
+an example of using loop on automatically running files with only the
+year being different.
+
+4.  Edits made and rationale: what was changed, why, and what was
     learned
 
-I changed the example value that AI made up and typed in the variables
-from homework 8 into the template.
+This prompt did not involve any revision made on code.
 
-Those variables are tools that AI made up for making me better
-understanding how system.time() works in different settings.
-
-1.  Verification: how correctness was checked (unit tests, small
+5.  Verification: how correctness was checked (unit tests, small
     examples, benchmarks)
 
-I checked with Homework 8 that the instructor provides on Github. The
-correct answers were included in that md file.
+No correctness involved.
